@@ -1,44 +1,49 @@
-const API_URL = 'http://localhost:3000/api/complaints';
+const API_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://pensamentos-2bt1.onrender.com/api/complaints" // Produção (Render)
+    : "http://localhost:3000/api/complaints"; // Desenvolvimento (localhost)
 
-document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+document
+  .getElementById("complaintForm")
+  .addEventListener("submit", async (e) => {
     e.preventDefault();
-    const title = document.getElementById('title').value;
-    const message = document.getElementById('message').value;
+    const title = document.getElementById("title").value;
+    const message = document.getElementById("message").value;
 
     const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ title, message })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, message }),
     });
 
     const complaint = await response.json();
     appendComplaint(complaint);
 
-    document.getElementById('title').value = '';
-    document.getElementById('message').value = '';
-});
+    document.getElementById("title").value = "";
+    document.getElementById("message").value = "";
+  });
 
 async function loadComplaints() {
-    const response = await fetch(API_URL);
-    const complaints = await response.json();
-    complaints.forEach(appendComplaint);
+  const response = await fetch(API_URL);
+  const complaints = await response.json();
+  complaints.forEach(appendComplaint);
 }
 
 function appendComplaint(complaint) {
-    const li = document.createElement('li');
-    li.innerHTML = `
+  const li = document.createElement("li");
+  li.innerHTML = `
         <strong>${complaint.title}</strong>
         <p>${complaint.message}</p>
         <button onclick="deleteComplaint('${complaint._id}')">Deletar</button>
     `;
-    document.getElementById('complaintsList').appendChild(li);
+  document.getElementById("complaintsList").appendChild(li);
 }
 
 async function deleteComplaint(id) {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    document.location.reload();
+  await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  document.location.reload();
 }
 
 loadComplaints();
